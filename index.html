@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.8">
+<meta name="app-version" content="1.0.0-rc.9">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -789,6 +789,8 @@ form.onsubmit = async event => {
     byId('query').value = '';
     locationFilter.value = '';
     render();
+    // Return to the top only after the item has been saved successfully.
+    window.scrollTo({top: 0, left: 0, behavior: 'instant'});
     saveButton.textContent = '儲存成功';
     setTimeout(() => {
       saveButton.textContent = '儲存物品';
