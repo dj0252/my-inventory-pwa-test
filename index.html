@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.6">
+<meta name="app-version" content="1.0.0-rc.7">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -105,7 +105,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <div class="grid">
 <label>物品名稱<input name="name" required maxlength="120" placeholder="例：備用充電線"></label>
 <label>備註（選填）<input name="note" maxlength="300" placeholder="例：放在黑色收納袋裡"></label>
-<label>收納位置<input name="place" required maxlength="180" list="places" placeholder="例：書房 ＞ 書桌 ＞ 右側第二格"></label>
+<label>收納位置<select id="place-picker" aria-label="選擇既有收納位置"><option value="">選擇既有位置（或在下方自行輸入）</option></select><input name="place" required maxlength="180" placeholder="例：書房 ＞ 書桌 ＞ 右側第二格" aria-label="收納位置名稱"></label>
 </div>
 <div class="photo-tools">
 <label for="place-file">收納位置照片（選填，同名位置共用）</label>
@@ -116,7 +116,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 </div>
 <div class="actions"><button type="submit" id="save-item" hidden>儲存物品</button><button type="button" id="cancel" hidden>取消編輯</button></div>
 </form>
-<datalist id="places"></datalist>
+
 <p id="status" role="status"></p>
 </section>
 <section id="finder" role="tabpanel" aria-labelledby="find-tab">
@@ -383,7 +383,16 @@ async function readThumbnail(file) {
   }
 }
 
-fields.place.addEventListener('input', syncPlacePhoto);
+const placePicker = byId('place-picker');
+placePicker.addEventListener('change', () => {
+  if (!placePicker.value) return;
+  fields.place.value = placePicker.value;
+  fields.place.dispatchEvent(new Event('input', {bubbles: true}));
+});
+fields.place.addEventListener('input', () => {
+  placePicker.value = [...placePicker.options].some(option => option.value === fields.place.value) ? fields.place.value : '';
+  syncPlacePhoto();
+});
 placeFile.onclick = event => {
   if (fields.place.value.trim()) return;
   event.preventDefault();
@@ -579,6 +588,7 @@ async function save(next, message, feedback = status, restore = false) {
 function resetForm() {
   editing = null;
   form.reset();
+  placePicker.value = '';
   showPhoto('');
   showExtraPhoto('');
   activePlace = '';
@@ -604,11 +614,12 @@ function render() {
   const selected = locationFilter.value;
   const places = [...new Set(entries.map(item => item.place))].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
   locationFilter.replaceChildren(new Option('所有位置', ''));
-  byId('places').replaceChildren();
+  placePicker.replaceChildren(new Option('選擇既有位置（或在下方自行輸入）', ''));
   for (const place of places) {
     locationFilter.add(new Option(place, place));
-    byId('places').append(new Option('', place));
+    placePicker.add(new Option(place, place));
   }
+  placePicker.value = places.includes(fields.place.value) ? fields.place.value : '';
   locationFilter.value = places.includes(selected) ? selected : '';
   const cards = byId('location-cards');
   cards.replaceChildren();
