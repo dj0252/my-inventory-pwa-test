@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.13">
+<meta name="app-version" content="1.0.0-rc.14">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -108,7 +108,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <label>收納位置（必填）<select id="place-picker" aria-label="選擇既有收納位置"><option value="">請選擇收納位置</option><option value="__new_place__">＋ 新增收納位置（自行輸入）</option></select><input name="place" required maxlength="180" placeholder="輸入新的收納位置" aria-label="新收納位置名稱" hidden><button type="button" id="place-back" hidden>返回選擇既有位置</button></label>
 </div>
 <div class="photo-tools">
-<label for="place-file">收納位置照片（必填，已有照片會自動帶入）</label>
+<label for="place-file">收納位置照片（必填）</label>
 <div class="actions" id="place-photo-actions"><button type="button" id="place-choose" class="photo-action photo-pick"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h4l1.5-2h5L16 8h4v11H4z"/><circle cx="12" cy="13" r="3"/></svg><span>選擇照片</span></button><button type="button" id="place-camera" class="photo-action photo-pick" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h4l1.5-2h5L16 8h4v11H4z"/><circle cx="12" cy="13" r="3"/></svg><span>拍照</span></button></div><p id="place-selection" role="status">尚未選取照片</p><input id="place-file" type="file" accept="image/*" hidden>
 <img id="place-preview" class="photo" alt="收納位置照片預覽" hidden>
 <div><button type="button" id="remove-place-photo" class="photo-action photo-remove" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>移除位置照片</span></button></div>
