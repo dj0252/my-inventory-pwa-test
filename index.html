@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.9">
+<meta name="app-version" content="1.0.0-rc.10">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -751,6 +751,32 @@ function render() {
   }
 }
 
+// Use one consistent, visible validation message instead of browser-specific popups.
+form.noValidate = true;
+const validationHint = document.createElement('p');
+validationHint.id = 'entry-validation';
+validationHint.setAttribute('role', 'alert');
+validationHint.style.cssText = 'color:#a12828;font-weight:700;margin:8px 0';
+validationHint.hidden = true;
+function clearEntryValidation() {
+  validationHint.hidden = true;
+  validationHint.textContent = '';
+  for (const node of [byId('photo-choose'), fields.name, placePicker, fields.place]) {
+    node.removeAttribute('aria-invalid');
+  }
+}
+function showEntryValidation(target, message) {
+  clearEntryValidation();
+  target.setAttribute('aria-invalid', 'true');
+  validationHint.textContent = message;
+  target.insertAdjacentElement('afterend', validationHint);
+  validationHint.hidden = false;
+  target.scrollIntoView({behavior: 'smooth', block: 'center'});
+  target.focus({preventScroll: true});
+}
+form.addEventListener('input', clearEntryValidation);
+form.addEventListener('change', clearEntryValidation);
+
 form.onsubmit = async event => {
   event.preventDefault();
   if (saveButton.disabled) return;
@@ -759,16 +785,20 @@ form.onsubmit = async event => {
     return;
   }
   if (!photo) {
-    byId('photo-selection').textContent = '請先選取一張物品照片';
-    byId('photo-choose').focus();
+    showEntryValidation(byId('photo-choose'), '請先選擇物品照片。');
     return;
   }
   const name = fields.name.value.trim();
   const place = fields.place.value.trim();
-  if (!name || !place) {
-    status.textContent = '請填寫物品名稱和收納位置。';
+  if (!name) {
+    showEntryValidation(fields.name, '請輸入物品名稱。');
     return;
   }
+  if (!place) {
+    showEntryValidation(placePicker.value === '__new_place__' ? fields.place : placePicker, '請選擇或新增收納位置。');
+    return;
+  }
+  clearEntryValidation();
   let id = editing ?? Date.now();
   while (editing === null && entries.some(item => item.id === id)) id++;
   const item = {id, name, place, note: fields.note.value.trim()};
@@ -786,6 +816,7 @@ form.onsubmit = async event => {
   saveButton.disabled = true;
   if (await save(linked, '已儲存「' + name + '」。')) {
     resetForm();
+    clearEntryValidation();
     byId('query').value = '';
     locationFilter.value = '';
     render();
