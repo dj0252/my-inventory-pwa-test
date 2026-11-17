@@ -1,0 +1,19 @@
+{
+  "name": "大海撈針",
+  "short_name": "大海撈針",
+  "description": "個人物品清冊與位置查找",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ed",
+  "theme_color": "#24533f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
