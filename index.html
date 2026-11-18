@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.16">
+<meta name="app-version" content="1.0.0-rc.17">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -410,11 +410,12 @@ function openPlaceOptions() {
         placePicker.hidden = true;
         fields.place.focus();
       } else {
-        manualPlace = false;
+        manualPlace = true;
         fields.place.value = choice.value;
-        fields.place.hidden = true;
-        placePicker.hidden = false;
-        placePicker.textContent = choice.value;
+        draftPlace = choice.value;
+        fields.place.hidden = false;
+        placePicker.hidden = true;
+        fields.place.focus();
       }
       fields.place.dispatchEvent(new Event('input', {bubbles:true}));
     };
@@ -425,7 +426,7 @@ function openPlaceOptions() {
 }
 function syncPlacePicker() {
   const value = fields.place.value;
-  manualPlace = !!value && !knownPlaces.includes(value);
+  manualPlace = !!value;
   if (manualPlace) draftPlace = value;
   fields.place.hidden = !manualPlace;
   placePicker.hidden = manualPlace;
