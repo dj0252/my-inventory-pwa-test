@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.20">
+<meta name="app-version" content="1.0.0-rc.21">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -352,7 +352,23 @@ function syncPlacePicker() {
   placePicker.textContent = !manualPlace && value ? value : '請選擇收納位置';
   closePlaceOptions();
 }
-placePicker.addEventListener('click', () => placeOptions.hidden ? openPlaceOptions() : closePlaceOptions());
+placePicker.addEventListener('click', () => {
+  if (!placeOptions.hidden) {
+    closePlaceOptions();
+    return;
+  }
+  // A selected location is editable on the next tap, without changing other items.
+  if (fields.place.value.trim()) {
+    manualPlace = true;
+    draftPlace = fields.place.value;
+    fields.place.hidden = false;
+    placePicker.hidden = true;
+    fields.place.focus();
+    fields.place.setSelectionRange(fields.place.value.length, fields.place.value.length);
+    return;
+  }
+  openPlaceOptions();
+});
 // The text field is only used for explicit manual entry; tapping it must not open the choice menu.
 fields.place.addEventListener('input', () => {
   if (manualPlace) draftPlace = fields.place.value;
