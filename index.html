@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.19">
+<meta name="app-version" content="1.0.0-rc.20">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -321,12 +321,12 @@ function openPlaceOptions() {
         placePicker.hidden = true;
         fields.place.focus();
       } else {
-        manualPlace = true;
+        manualPlace = false;
         fields.place.value = choice.value;
         draftPlace = choice.value;
-        fields.place.hidden = false;
-        placePicker.hidden = true;
-        fields.place.focus();
+        fields.place.hidden = true;
+        placePicker.hidden = false;
+        placePicker.textContent = choice.value;
       }
       fields.place.dispatchEvent(new Event('input', {bubbles:true}));
     };
@@ -334,6 +334,14 @@ function openPlaceOptions() {
   }
   placeOptions.hidden = false;
   placePicker.setAttribute('aria-expanded', 'true');
+  // Scroll the viewport, not the field's position in the form.
+  // The picker is a button, so opening the menu does not invoke the keyboard.
+  requestAnimationFrame(() => {
+    const top = placePicker.getBoundingClientRect().top;
+    const desiredTop = 72;
+    const delta = top - desiredTop;
+    if (delta > 0) window.scrollBy({top: delta, behavior: 'smooth'});
+  });
 }
 function syncPlacePicker() {
   const value = fields.place.value;
@@ -345,7 +353,7 @@ function syncPlacePicker() {
   closePlaceOptions();
 }
 placePicker.addEventListener('click', () => placeOptions.hidden ? openPlaceOptions() : closePlaceOptions());
-fields.place.addEventListener('click', () => { if (placeOptions.hidden) openPlaceOptions(); });
+// The text field is only used for explicit manual entry; tapping it must not open the choice menu.
 fields.place.addEventListener('input', () => {
   if (manualPlace) draftPlace = fields.place.value;
   syncPlacePhoto();
