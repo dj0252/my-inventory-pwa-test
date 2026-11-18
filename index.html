@@ -3,12 +3,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.17">
+<meta name="app-version" content="1.0.0-rc.18">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f6f4ed;color:#233a31;font:16px/1.5 "Microsoft JhengHei",sans-serif}main{max-width:850px;margin:auto;padding:32px 18px}h1{font-size:clamp(32px,7vw,56px);margin:0}h2,h3,p{margin:0 0 8px}header{margin-bottom:24px}section,article{background:#fff;border:1px solid #dedfd3;border-radius:16px;padding:18px;margin:12px 0}label{display:block}input,button,select{font:inherit;padding:9px 12px;border:1px solid #84968a;border-radius:8px}input,select{width:100%;background:white;color:inherit}[hidden]{display:none!important}#place-control{display:block;position:relative}#place-picker{width:100%;text-align:left;background:white;min-height:45px}#place-options{display:block;position:absolute;z-index:30;left:0;right:0;top:100%;max-height:260px;overflow-y:auto;background:white;border:1px solid #84968a;border-radius:8px;box-shadow:0 5px 14px #0003}#place-options button{display:block;width:100%;text-align:left;border:0;border-radius:0;border-bottom:1px solid #eee;overflow-wrap:anywhere;padding:12px}#place-options button:focus-visible{outline-offset:-3px}#place-photo-actions{flex-wrap:nowrap}#place-photo-actions .photo-action{white-space:nowrap;min-width:0;flex:0 1 auto}@media(max-width:370px){#place-photo-actions .photo-action{padding:8px 7px;font-size:.92rem}}button{cursor:pointer;background:white;color:inherit}button[type=submit]{background:#24533f;color:white}button:hover{border-color:#153b2c}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b47626;outline-offset:2px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}article p{overflow-wrap:anywhere}article h3{overflow-wrap:anywhere;color:#8a6100}.place{font-weight:bold;color:#24533f}footer{margin-top:20px}#status{min-height:1.5em;margin-top:8px}
-.photo{width:112px;height:112px;object-fit:contain;background:#f6f4ed;border-radius:10px;margin:8px 0}.photo-tools{margin-top:12px}#suggestions{margin-bottom:12px}
 .gallery{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.gallery figure{margin:0}.gallery .photo{width:148px;height:var(--result-photo-height);display:block}.gallery figcaption{font-size:.9rem}.location-card{text-align:left}.location-card img{display:block;width:96px;height:72px;object-fit:contain;margin-bottom:4px}.location-card[aria-pressed="true"]{background:#24533f;color:white}#save-item:active{transform:translateY(2px);background:#173c2b}
 #save-item:disabled{background:#dcebe0;color:#24533f;cursor:default}
 #status:not(:empty){font-weight:bold}
@@ -89,9 +88,9 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <label for="photo-file">物品照片（必填）</label>
 <div class="actions"><button type="button" id="photo-choose" class="photo-action photo-pick"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h4l1.5-2h5L16 8h4v11H4z"/><circle cx="12" cy="13" r="3"/></svg><span>選擇照片</span></button><button type="button" id="photo-camera" class="photo-action photo-pick" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h4l1.5-2h5L16 8h4v11H4z"/><circle cx="12" cy="13" r="3"/></svg><span>拍照</span></button></div><input id="photo-file" type="file" accept="image/*" hidden>
 <img id="photo-preview" class="photo" alt="物品照片預覽" hidden>
-<div class="actions"><button type="button" id="recognize" class="photo-action photo-scan" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5M8 12h8"/></svg><span>辨識照片</span></button><button type="button" id="remove-photo" class="photo-action photo-remove" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>移除照片</span></button></div>
+<div class="actions"><button type="button" id="remove-photo" class="photo-action photo-remove" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>移除照片</span></button></div>
 <p id="photo-selection" role="status">尚未選取照片</p><p id="photo-status" role="status"></p>
-<div id="suggestions" class="actions"></div>
+
 </div>
 <div class="photo-tools">
 <label for="extra-file">第二張物品照片（選填）</label>
@@ -125,7 +124,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <label>依位置瀏覽<select id="location"></select></label></div>
 <details id="location-gallery"><summary>看位置照片</summary><div id="location-cards" class="actions" aria-label="收納位置"></div></details><p id="count" tabindex="-1" aria-live="polite"></p><div id="items"></div><div id="pages" class="actions"></div>
 </section>
-<footer><p>清冊和縮圖儲存在這個瀏覽器。辨識需要連網載入模型，照片在瀏覽器內處理。換裝置或清除瀏覽資料前，可先匯出備份。</p>
+<footer><p>清冊和縮圖儲存在這個瀏覽器。換裝置或清除瀏覽資料前，可先匯出備份。</p>
 <div class="actions"><button id="export">匯出備份</button><button id="import">匯入備份</button><button id="merge">合併備份</button><input id="merge-file" type="file" accept=".json,application/json" hidden><dialog id="merge-preview" aria-label="合併備份預覽"></dialog><input id="file" type="file" accept=".json,application/json" hidden></div>
 <div class="actions backup-settings"><button id="backup-folder" hidden>設定備份資料夾</button><span id="backup-folder-hint" hidden>第一次使用備份功能前，請先設定備份資料夾。</span></div>
 <p id="backup-status" role="status"></p></footer>
@@ -242,8 +241,6 @@ const photoFile = byId('photo-file');
 byId('photo-choose').onclick = () => photoFile.click();
 const preview = byId('photo-preview');
 const photoStatus = byId('photo-status');
-const suggestions = byId('suggestions');
-const recognize = byId('recognize');
 
 function showPhoto(value, selection = '已有物品照片') {
   photoRevision++;
@@ -254,109 +251,22 @@ function showPhoto(value, selection = '已有物品照片') {
   preview.hidden = !value;
   if (value) preview.src = value;
   else preview.removeAttribute('src');
-  recognize.hidden = !value;
-  recognize.disabled = false;
-  recognize.removeAttribute('aria-busy');
   byId('remove-photo').hidden = !value;
-  suggestions.replaceChildren();
   photoStatus.textContent = '';
 }
-
-function loadScript(url) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.onload = resolve;
-    script.onerror = () => { script.remove(); reject(new Error('Model dependency unavailable')); };
-    document.head.append(script);
-  });
-}
-
-function getModel() {
-  if (!modelPromise) {
-    modelPromise = (async () => {
-      if (!window.tf) await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js');
-      if (!window.mobilenet) await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js');
-      return window.mobilenet.load({version: 2, alpha: 1});
-    })().catch(error => { modelPromise = undefined; throw error; });
-  }
-  return modelPromise;
-}
-
-const translations = {
-  'hand-held computer':'手持式電腦', 'handheld computer':'手持式電腦',
-  'switch':'開關', 'electric switch':'開關', 'hard disc':'硬碟',
-  'hard disk':'硬碟', 'fixed disk':'硬碟', 'flash drive':'隨身碟',
-  'desktop computer':'桌上型電腦', 'modem':'數據機', 'joystick':'遊戲控制器', 'ocarina':'陶笛', 'hatchet':'手斧',
-  'power drill':'電鑽', 'measuring cup':'量杯', 'bottlecap':'瓶蓋',
-  'can opener':'開罐器', 'frying pan':'平底鍋', 'ladle':'湯勺',
-  'stapler':'訂書機', 'envelope':'信封', 'binder':'活頁夾',
-  'wallet':'錢包', 'sunglasses':'太陽眼鏡', 'suitcase':'行李箱',
-  'padlock':'掛鎖', 'combination lock':'密碼鎖', 'key':'鑰匙',
-  'computer keyboard':'電腦鍵盤', 'mouse':'滑鼠', 'remote control':'遙控器',
-  'cellular telephone':'手機', 'laptop':'筆記型電腦', 'notebook':'筆記型電腦',
-  'water bottle':'水瓶', 'coffee mug':'馬克杯', 'cup':'杯子',
-  'backpack':'背包', 'umbrella':'雨傘', 'running shoe':'跑鞋',
-  'screwdriver':'螺絲起子', 'hammer':'鐵鎚', 'scissors':'剪刀',
-  'tape player':'卡帶播放器', 'digital clock':'數位時鐘', 'wall clock':'掛鐘',
-  'vacuum':'吸塵器', 'electric fan':'電風扇', 'toaster':'烤麵包機',
-  'microphone':'麥克風', 'monitor':'螢幕', 'printer':'印表機',
-  'ballpoint':'原子筆', 'pencil box':'鉛筆盒', 'eraser':'橡皮擦'
-};
-
-recognize.onclick = async () => {
-  const revision = photoRevision;
-  recognize.disabled = true;
-  suggestions.replaceChildren();
-  recognize.setAttribute('aria-busy', 'true');
-  photoStatus.textContent = '正在載入模型並辨識照片…';
-  try {
-    const model = await getModel();
-    if (revision !== photoRevision) return;
-    await preview.decode();
-    if (revision !== photoRevision) return;
-    const predictions = await model.classify(preview, 3);
-    if (revision !== photoRevision) return;
-    const names = new Set();
-    for (const prediction of predictions) {
-      const labels = prediction.className.toLowerCase().split(',').map(label => label.trim());
-      const label = labels.find(label => Object.hasOwn(translations, label));
-      if (!label) continue;
-      const name = translations[label];
-      if (names.has(name)) continue;
-      names.add(name);
-      const button = element('button', name, suggestions);
-      button.type = 'button';
-      button.onclick = () => { fields.name.value = name; updateSaveVisibility(); fields.name.focus(); };
-    }
-    photoStatus.textContent = names.size ? '點選候選名稱填入欄位，也可以自行修改。' : '這張照片沒有可顯示的中文候選名稱，請自行填寫。';
-  } catch {
-    if (revision === photoRevision) photoStatus.textContent = '辨識失敗，請確認網路連線後重試。你也可以自行填寫名稱並保存照片。';
-  } finally {
-    if (revision === photoRevision) {
-      recognize.disabled = false;
-      recognize.removeAttribute('aria-busy');
-    }
-  }
-};
 
 photoFile.onchange = async event => {
   const file = event.currentTarget.files[0];
   if (!file) return;
   const revision = ++photoRevision;
-  recognize.disabled = true;
-  suggestions.replaceChildren();
   photoStatus.textContent = '正在讀取照片…';
   try {
     const thumbnail = await readThumbnail(file);
     if (revision !== photoRevision) return;
     showPhoto(thumbnail, '已選取一張照片');
-    recognize.click();
   } catch {
     if (revision === photoRevision) {
       photoFile.value = '';
-      recognize.disabled = false;
-      recognize.removeAttribute('aria-busy');
       photoStatus.textContent = '無法開啟這張圖片，請試試 JPG 或 PNG。';
     }
   }
