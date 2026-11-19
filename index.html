@@ -3,11 +3,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.22">
+<meta name="app-version" content="1.0.0-rc.23">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f6f4ed;color:#233a31;font:16px/1.5 "Microsoft JhengHei",sans-serif}main{max-width:850px;margin:auto;padding:32px 18px}h1{font-size:clamp(32px,7vw,56px);margin:0}h2,h3,p{margin:0 0 8px}header{margin-bottom:24px}section,article{background:#fff;border:1px solid #dedfd3;border-radius:16px;padding:18px;margin:12px 0}label{display:block}input,button,select{font:inherit;padding:9px 12px;border:1px solid #84968a;border-radius:8px}input,select{width:100%;background:white;color:inherit}[hidden]{display:none!important}#place-control{display:block;position:relative}#place-select-row{display:flex;gap:8px;align-items:stretch}#place-select-row #place-picker{flex:1;min-width:0}#place-edit{flex:0 0 46px;border:1px solid #84968a;border-radius:8px;font-size:22px}#place-picker{width:100%;text-align:left;background:white;min-height:45px}#place-options{display:block;position:absolute;z-index:30;left:0;right:0;top:100%;max-height:260px;overflow-y:auto;background:white;border:1px solid #84968a;border-radius:8px;box-shadow:0 5px 14px #0003}#place-options button{display:block;width:100%;text-align:left;border:0;border-radius:0;border-bottom:1px solid #eee;overflow-wrap:anywhere;padding:12px}#place-options button:focus-visible{outline-offset:-3px}#place-photo-actions{flex-wrap:nowrap}#place-photo-actions .photo-action{white-space:nowrap;min-width:0;flex:0 1 auto}@media(max-width:370px){#place-photo-actions .photo-action{padding:8px 7px;font-size:.92rem}}button{cursor:pointer;background:white;color:inherit}button[type=submit]{background:#24533f;color:white}button:hover{border-color:#153b2c}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b47626;outline-offset:2px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}article p{overflow-wrap:anywhere}article h3{overflow-wrap:anywhere;color:#8a6100}.place{font-weight:bold;color:#24533f}footer{margin-top:20px}#status{min-height:1.5em;margin-top:8px}
+*{box-sizing:border-box}body{margin:0;background:#f6f4ed;color:#233a31;font:16px/1.5 "Microsoft JhengHei",sans-serif}main{max-width:850px;margin:auto;padding:32px 18px}h1{font-size:clamp(32px,7vw,56px);margin:0}h2,h3,p{margin:0 0 8px}header{margin-bottom:24px}section,article{background:#fff;border:1px solid #dedfd3;border-radius:16px;padding:18px;margin:12px 0}label{display:block}input,button,select{font:inherit;padding:9px 12px;border:1px solid #84968a;border-radius:8px}input,select{width:100%;background:white;color:inherit}[hidden]{display:none!important}#place-control{display:block;position:relative}#place-select-row{display:flex;gap:8px;align-items:stretch}#place-select-row #place-picker{flex:1;min-width:0}#place-edit{flex:0 0 46px;border:1px solid #84968a;border-radius:8px;font-size:22px}#place-picker{width:100%;text-align:left;background:white;min-height:45px}#place-options{display:block;position:absolute;z-index:30;left:0;right:0;top:100%;max-height:260px;overflow-y:auto;background:white;border:1px solid #84968a;border-radius:8px;box-shadow:0 5px 14px #0003}#place-options button{display:block;width:100%;text-align:left;border:0;border-radius:0;border-bottom:1px solid #eee;overflow-wrap:anywhere;padding:12px}#place-options button:focus-visible{outline-offset:-3px}#place-builder{padding:12px;border:1px solid #84968a;border-radius:8px;margin-top:8px}#place-levels input{margin:5px 0}#place-builder button{margin:4px}#place-photo-actions{flex-wrap:nowrap}#place-photo-actions .photo-action{white-space:nowrap;min-width:0;flex:0 1 auto}@media(max-width:370px){#place-photo-actions .photo-action{padding:8px 7px;font-size:.92rem}}button{cursor:pointer;background:white;color:inherit}button[type=submit]{background:#24533f;color:white}button:hover{border-color:#153b2c}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b47626;outline-offset:2px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}article p{overflow-wrap:anywhere}article h3{overflow-wrap:anywhere;color:#8a6100}.place{font-weight:bold;color:#24533f}footer{margin-top:20px}#status{min-height:1.5em;margin-top:8px}
 .gallery{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}.gallery figure{margin:0}.gallery .photo{width:148px;height:var(--result-photo-height);display:block}.gallery figcaption{font-size:.9rem}.location-card{text-align:left}.location-card img{display:block;width:96px;height:72px;object-fit:contain;margin-bottom:4px}.location-card[aria-pressed="true"]{background:#24533f;color:white}#save-item:active{transform:translateY(2px);background:#173c2b}
 #save-item:disabled{background:#dcebe0;color:#24533f;cursor:default}
 #status:not(:empty){font-weight:bold}
@@ -105,7 +105,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <div class="grid">
 <label>物品名稱（必填）<input name="name" required maxlength="120" placeholder="例：備用充電線"></label>
 <label>備註（選填）<input name="note" maxlength="300" placeholder="例：放在黑色收納袋裡"></label>
-<label>收納位置（必填）<span id="place-control"><span id="place-select-row"><button type="button" id="place-picker" aria-label="選擇收納位置" aria-expanded="false" aria-controls="place-options">請選擇收納位置</button><button type="button" id="place-edit" aria-label="編輯收納位置文字" title="編輯收納位置文字" hidden>✎</button></span><input name="place" required maxlength="180" placeholder="輸入新的收納位置" aria-label="收納位置名稱" autocomplete="off" hidden><span id="place-options" role="listbox" hidden></span></span></label>
+<label>收納位置（必填）<span id="place-control"><span id="place-select-row"><button type="button" id="place-picker" aria-label="選擇收納位置" aria-expanded="false" aria-controls="place-options">請選擇收納位置</button><button type="button" id="place-edit" aria-label="編輯收納位置文字" title="編輯收納位置文字" hidden>✎</button></span><input name="place" required maxlength="180" placeholder="輸入新的收納位置" aria-label="收納位置名稱" autocomplete="off" hidden><span id="place-options" role="listbox" hidden></span><div id="place-builder" hidden><p>分層建立：房間 → 家具 → 具體位置，系統自動加入 &gt;。</p><div id="place-levels"></div><button type="button" id="place-add-level">＋ 增加一層</button><button type="button" id="place-build-done">使用這個位置</button><button type="button" id="place-build-cancel">取消</button></div></span></label>
 </div>
 <div class="photo-tools">
 <label for="place-file">收納位置照片（必填）</label>
@@ -300,21 +300,49 @@ const placeEdit = byId('place-edit');
 let manualPlace = false;
 let draftPlace = '';
 let knownPlaces = [];
+const placeBuilder = byId('place-builder'), placeLevels = byId('place-levels');
+function addPlaceLevel(value='') {
+  const input = document.createElement('input');
+  input.type='text'; input.maxLength=180;
+  input.placeholder=['房間或區域','家具或收納設備','抽屜或具體位置'][placeLevels.children.length] || '更細的位置';
+  input.value=value; placeLevels.append(input);
+}
+byId('place-add-level').onclick=()=>addPlaceLevel();
+byId('place-build-cancel').onclick=()=>{placeBuilder.hidden=true;placePicker.hidden=false;};
+byId('place-build-done').onclick=()=>{
+  const value=[...placeLevels.querySelectorAll('input')].map(x=>x.value.trim()).filter(Boolean).join(' > ');
+  if(!value){placeLevels.querySelector('input')?.focus();return;}
+  if(value.length>180){alert('收納位置最多 180 字');return;}
+  fields.place.value=value;draftPlace=value;manualPlace=false;
+  fields.place.hidden=true;placePicker.hidden=false;placePicker.textContent=value;placeEdit.hidden=false;placeBuilder.hidden=true;
+  fields.place.dispatchEvent(new Event('input',{bubbles:true}));
+};
+function openPlaceBuilder(){
+  closePlaceOptions();placeLevels.replaceChildren();
+  const parts=fields.place.value.split(/\s*>\s*/).map(x=>x.trim()).filter(Boolean);
+  (parts.length?parts:['','','']).forEach(addPlaceLevel);
+  placeBuilder.hidden=false;placePicker.hidden=true;fields.place.hidden=true;placeEdit.hidden=true;
+}
+
 function closePlaceOptions() {
   placeOptions.hidden = true;
   placePicker.setAttribute('aria-expanded', 'false');
 }
 function openPlaceOptions() {
   placeOptions.replaceChildren();
-  const draft = draftPlace.trim();
-  const choices = [{label: '＋ 新增收納位置（自行輸入）', value: '__draft__'}, ...knownPlaces.map(value => ({label:value, value}))];
-  for (const choice of choices) {
+  const search=document.createElement('input');search.type='search';search.placeholder='搜尋現有收納位置';
+  const results=document.createElement('div');placeOptions.append(search,results);
+  const choices=[{label:'＋ 分層建立收納位置',value:'__layers__'},{label:'＋ 自由輸入收納位置',value:'__draft__'},...knownPlaces.map(value=>({label:value,value}))];
+  const renderChoices=()=>{
+  results.replaceChildren();
+  for(const choice of choices.filter(c=>c.value.startsWith('__')||c.label.includes(search.value.trim()))) {
     const button = document.createElement('button');
     button.type = 'button';
     button.setAttribute('role', 'option');
     button.textContent = choice.label;
     button.onclick = () => {
       closePlaceOptions();
+      if (choice.value === '__layers__') {openPlaceBuilder();return;}
       if (choice.value === '__draft__') {
         manualPlace = true;
         fields.place.value = '';
@@ -334,8 +362,10 @@ function openPlaceOptions() {
       }
       fields.place.dispatchEvent(new Event('input', {bubbles:true}));
     };
-    placeOptions.append(button);
+    results.append(button);
   }
+  };
+  search.addEventListener('input',renderChoices);renderChoices();
   placeOptions.hidden = false;
   placePicker.setAttribute('aria-expanded', 'true');
   // Scroll the viewport, not the field's position in the form.
