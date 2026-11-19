@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.26">
+<meta name="app-version" content="1.0.0-rc.27">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -122,7 +122,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 <section id="finder" role="tabpanel" aria-labelledby="find-tab">
 <h2 id="list-title">尋找物品</h2>
 <div class="grid"><label>搜尋物品名稱<input id="query" type="search" autocomplete="off" placeholder="例：充電線、膠水"></label>
-<label>依位置瀏覽<select id="location"></select></label></div>
+<div><label for="location-root">依位置瀏覽</label><div id="location-levels"></div><button type="button" id="location-clear">所有位置</button><select id="location" hidden aria-label="目前選取的位置"></select></div></div>
 <details id="location-gallery"><summary>看位置照片</summary><div id="location-cards" class="actions" aria-label="收納位置"></div></details><p id="count" tabindex="-1" aria-live="polite"></p><div id="items"></div><div id="pages" class="actions"></div>
 </section>
 <footer><p>清冊和縮圖儲存在這個瀏覽器。換裝置或清除瀏覽資料前，可先匯出備份。</p>
@@ -684,6 +684,38 @@ function element(tag, text, parent) {
   return node;
 }
 
+const locationLevels = byId('location-levels');
+const locationClear = byId('location-clear');
+let browsingPath = [];
+function pathMatches(place, path) {
+  const parts=locationParts(place);
+  return path.every((segment,i)=>parts[i]===segment);
+}
+function drawLocationLevels(places) {
+  locationLevels.replaceChildren();
+  if(!browsingPath.length) locationFilter.value='';
+  const maxDepth=Math.max(1,...places.map(p=>locationParts(p).length));
+  const depth=Math.min(maxDepth,browsingPath.length+1);
+  for(let i=0;i<depth;i++){
+    const level=i;
+    const prefix=browsingPath.slice(0,i);
+    const choices=[...new Set(places.filter(p=>pathMatches(p,prefix)).map(p=>locationParts(p)[i]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+    if(!choices.length)break;
+    const select=document.createElement('select');
+    select.setAttribute('aria-label','第'+(i+1)+'層收納位置');
+    select.append(new Option(i===0?'所有位置':'此層全部位置',''));
+    for(const choice of choices)select.add(new Option(choice,choice));
+    select.value=browsingPath[i]||'';
+    select.onchange=()=>{
+      browsingPath=select.value?[...prefix,select.value]:prefix;
+      locationFilter.value='';
+      byId('query').value='';
+      render();
+    };
+    locationLevels.append(select);
+  }
+}
+locationClear.onclick=()=>{browsingPath=[];locationFilter.value='';byId('query').value='';render();};
 const locationGallery = byId('location-gallery');
 const pageSize = 24;
 let page = 0;
@@ -698,6 +730,8 @@ function render() {
   for (const place of places) locationFilter.add(new Option(place, place));
   syncPlacePicker();
   locationFilter.value = places.includes(selected) ? selected : '';
+  if(browsingPath.length && !places.some(p=>pathMatches(p,browsingPath)))browsingPath=[];
+  drawLocationLevels(places);
   const cards = byId('location-cards');
   cards.replaceChildren();
   const totals = new Map();
@@ -715,21 +749,23 @@ function render() {
     }
     element('span', place + '（' + (totals.get(place) ?? 0) + ' 件）', button);
     button.onclick = () => {
-      locationFilter.value = locationFilter.value === place ? '' : place;
+      const next=locationFilter.value === place ? '' : place;
+      browsingPath=next?locationParts(next):[];
+      locationFilter.value=next;
       byId('query').value = '';
       render();
       cards.children[places.indexOf(place)].focus();
     };
   }
   const query = byId('query').value.trim().toLocaleLowerCase();
-  const filter = JSON.stringify([query, locationFilter.value]);
+  const filter = JSON.stringify([query, locationFilter.value, browsingPath]);
   if (filter !== previousFilter) page = 0;
   previousFilter = filter;
   const list = byId('items');
   const pages = byId('pages');
   list.replaceChildren();
   pages.replaceChildren();
-  if (!query && !locationFilter.value) {
+  if (!query && !locationFilter.value && !browsingPath.length) {
     byId('count').textContent = '目前有 ' + entries.length + ' 筆物品。輸入關鍵字或選擇位置即可查看。';
     return;
   }
@@ -737,6 +773,7 @@ function render() {
   const matches = entries.filter(item => {
     const text = item.name.toLocaleLowerCase();
     return (!locationFilter.value || item.place === locationFilter.value) &&
+      (!browsingPath.length || pathMatches(item.place,browsingPath)) &&
       terms.every(term => text.includes(term));
   });
   byId('count').textContent = entries.length
@@ -908,6 +945,7 @@ form.onsubmit = async event => {
 byId('cancel').onclick = () => { resetForm(); status.textContent = ''; fields.name.focus(); };
 byId('query').oninput = render;
 locationFilter.onchange = () => {
+  browsingPath=locationFilter.value?locationParts(locationFilter.value):[];
   byId('query').value = '';
   render();
 };
