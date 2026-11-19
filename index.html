@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.37">
+<meta name="app-version" content="1.0.0-rc.38">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -742,7 +742,7 @@ function drawLocationLevels(places) {
     locationLevels.append(select);
   }
 }
-locationClear.onclick=()=>{browsingPath=[];locationFilter.value='';byId('query').value='';render();};
+locationClear.onclick=()=>{browsingPath=[];locationFilter.value='';byId('query').value='';locationGallery.open=false;render();};
 const locationGallery = byId('location-gallery');
 const pageSize = 24;
 let page = 0;
@@ -759,6 +759,8 @@ function render() {
   locationFilter.value = places.includes(selected) ? selected : '';
   if(browsingPath.length && !places.some(p=>pathMatches(p,browsingPath)))browsingPath=[];
   drawLocationLevels(places);
+  locationGallery.hidden = browsingPath.length === 0;
+  if (!browsingPath.length) locationGallery.open = false;
   const cards = byId('location-cards');
   cards.replaceChildren();
   const totals = new Map();
