@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.31">
+<meta name="app-version" content="1.0.0-rc.32">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -429,14 +429,16 @@ function openPlaceOptions() {
   });
 }
 function syncPlacePicker() {
-  const value = fields.place.value;
-  manualPlace = !!value;
-  if (manualPlace) draftPlace = value;
-  fields.place.hidden = !manualPlace;
-  placePicker.hidden = manualPlace;
-  placeEdit.hidden = manualPlace || !value.trim();
-  placeReselect.hidden = !manualPlace;
-  placePicker.textContent = !manualPlace && value ? value : '請選擇收納位置';
+  // Both new and edited items use the same location picker.
+  // Editing starts with the saved location selected, not in manual-entry mode.
+  const value = fields.place.value.trim();
+  manualPlace = false;
+  draftPlace = value;
+  fields.place.hidden = true;
+  placePicker.hidden = false;
+  placeEdit.hidden = !value;
+  placeReselect.hidden = true;
+  placePicker.textContent = value || '請選擇收納位置';
   closePlaceOptions();
 }
 placePicker.addEventListener('click', () => placeOptions.hidden ? openPlaceOptions() : closePlaceOptions());
