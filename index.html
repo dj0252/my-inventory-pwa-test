@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.24">
+<meta name="app-version" content="1.0.0-rc.25">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -301,7 +301,7 @@ let manualPlace = false;
 let draftPlace = '';
 let knownPlaces = [];
 const placeBuilder = byId('place-builder'), placeLevels = byId('place-levels');
-function locationParts(value) { return value.split(/\\s*>\\s*/).map(x=>x.trim()).filter(Boolean); }
+function locationParts(value) { return value.split(/\s*>\s*/).map(x=>x.trim()).filter(Boolean); }
 function addPlaceLevel(value='') {
   const index=placeLevels.children.length;
   const row=document.createElement('div');
