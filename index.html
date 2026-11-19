@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.32">
+<meta name="app-version" content="1.0.0-rc.33">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -744,7 +744,12 @@ function render() {
   cards.replaceChildren();
   const totals = new Map();
   for (const item of entries) totals.set(item.place, (totals.get(item.place) ?? 0) + 1);
-  for (const place of locationGallery.open ? places : []) {
+  // Limit photo cards to the selected location branch.
+  const visiblePlaces = places.filter(place =>
+    (!browsingPath.length || pathMatches(place, browsingPath)) &&
+    (!locationFilter.value || place === locationFilter.value)
+  );
+  for (const place of locationGallery.open ? visiblePlaces : []) {
     const button = element('button', '', cards);
     button.className = 'location-card';
     button.setAttribute('aria-pressed', String(locationFilter.value === place));
@@ -762,7 +767,7 @@ function render() {
       locationFilter.value=next;
       byId('query').value = '';
       render();
-      cards.children[places.indexOf(place)].focus();
+      cards.children[visiblePlaces.indexOf(place)]?.focus();
     };
   }
   const query = byId('query').value.trim().toLocaleLowerCase();
