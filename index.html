@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.35">
+<meta name="app-version" content="1.0.0-rc.36">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -718,6 +718,8 @@ function drawLocationLevels(places) {
     select.value=browsingPath[i]||'';
     select.onchange=()=>{
       browsingPath=select.value?[...prefix,select.value]:prefix;
+      // Keep matching location photos visible as the user drills down.
+      if (browsingPath.length) locationGallery.open = true;
       locationFilter.value='';
       byId('query').value='';
       render();
