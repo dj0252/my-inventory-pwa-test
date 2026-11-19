@@ -123,7 +123,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 </section>
 <section id="finder" role="tabpanel" aria-labelledby="find-tab">
 <h2 id="list-title">尋找物品</h2>
-<div class="grid"><label>搜尋物品名稱<input id="query" type="search" autocomplete="off" placeholder="例：充電線、膠水"></label>
+<div class="grid"><label>搜尋物品名稱或備註<input id="query" type="search" autocomplete="off" placeholder="例：充電線、膠水"></label>
 <div><label for="location-root">依位置瀏覽</label><div id="location-levels"></div><button type="button" id="location-clear">重新選擇</button><select id="location" hidden aria-label="目前選取的位置"></select></div></div>
 <details id="location-gallery"><summary>看位置照片</summary><div id="location-cards" class="actions" aria-label="收納位置"></div></details><p id="count" tabindex="-1" aria-live="polite"></p><div id="items"></div><div id="pages" class="actions"></div>
 </section>
@@ -795,7 +795,7 @@ function render() {
   }
   const terms = query.split(/\s+/);
   const matches = entries.filter(item => {
-    const text = item.name.toLocaleLowerCase();
+    const text = [item.name, item.note || ''].join(' ').toLocaleLowerCase();
     return (!locationFilter.value || item.place === locationFilter.value) &&
       (!browsingPath.length || pathMatches(item.place,browsingPath)) &&
       terms.every(term => text.includes(term));
