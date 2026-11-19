@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.30">
+<meta name="app-version" content="1.0.0-rc.31">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -374,12 +374,11 @@ function closePlaceOptions() {
 }
 function openPlaceOptions() {
   placeOptions.replaceChildren();
-  const search=document.createElement('input');search.type='search';search.placeholder='搜尋現有收納位置';
-  const results=document.createElement('div');placeOptions.append(search,results);
+  const results=document.createElement('div');placeOptions.append(results);
   const choices=[{label:'＋ 分層建立收納位置',value:'__layers__'},{label:'＋ 自由輸入收納位置',value:'__draft__'},...knownPlaces.map(value=>({label:value,value}))];
   const renderChoices=()=>{
   results.replaceChildren();
-  const visible=choices.filter(c=>c.value.startsWith('__')||c.label.includes(search.value.trim()));
+  const visible=choices;
   let headingAdded=false;
   for(const choice of visible) {
     if(!choice.value.startsWith('__')&&!headingAdded){
@@ -417,7 +416,7 @@ function openPlaceOptions() {
     results.append(button);
   }
   };
-  search.addEventListener('input',renderChoices);renderChoices();
+  renderChoices();
   placeOptions.hidden = false;
   placePicker.setAttribute('aria-expanded', 'true');
   // Scroll the viewport, not the field's position in the form.
