@@ -208,8 +208,12 @@ const placePreview = byId('place-preview');
 const placeStatus = byId('place-status');
 const removePlacePhoto = byId('remove-place-photo');
 
+function normalizedPlaceKey(place) {
+  return String(place || '').split(/\s*>\s*/).map(part => part.trim().replace(/\s+/g, ' ')).filter(Boolean).join(' > ');
+}
 function photoForPlace(place) {
-  return entries.find(item => item.place === place && item.placePhoto)?.placePhoto ?? '';
+  const key = normalizedPlaceKey(place);
+  return entries.find(item => normalizedPlaceKey(item.place) === key && item.placePhoto)?.placePhoto ?? '';
 }
 
 function syncPlacePhoto() {
@@ -937,9 +941,18 @@ form.onsubmit = async event => {
     showEntryValidation(manualPlace ? fields.place : placePicker, '請選擇或新增收納位置。');
     return;
   }
+  // Recheck the shared location photo before requiring a new upload.
+  // This also handles an unchanged location or a previously missed picker event.
   if (!placePhoto) {
-    showEntryValidation(byId('place-choose'), '請先選擇收納位置照片。');
-    return;
+    const existingPlacePhoto = photoForPlace(place);
+    if (existingPlacePhoto) {
+      activePlace = place;
+      showPlacePhoto(existingPlacePhoto);
+      placeStatus.textContent = '已帶入這個位置的照片。';
+    } else {
+      showEntryValidation(byId('place-choose'), '請先選擇收納位置照片。');
+      return;
+    }
   }
   clearEntryValidation();
   let id = editing ?? Date.now();
