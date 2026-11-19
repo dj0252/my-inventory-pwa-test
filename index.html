@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.23">
+<meta name="app-version" content="1.0.0-rc.24">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -301,16 +301,59 @@ let manualPlace = false;
 let draftPlace = '';
 let knownPlaces = [];
 const placeBuilder = byId('place-builder'), placeLevels = byId('place-levels');
+function locationParts(value) { return value.split(/\\s*>\\s*/).map(x=>x.trim()).filter(Boolean); }
 function addPlaceLevel(value='') {
-  const input = document.createElement('input');
-  input.type='text'; input.maxLength=180;
-  input.placeholder=['房間或區域','家具或收納設備','抽屜或具體位置'][placeLevels.children.length] || '更細的位置';
-  input.value=value; placeLevels.append(input);
+  const index=placeLevels.children.length;
+  const row=document.createElement('div');
+  row.className='place-level-row';
+  const select=document.createElement('select');
+  select.setAttribute('aria-label','第'+(index+1)+'層位置');
+  const input=document.createElement('input');
+  input.type='text';input.maxLength=180;
+  input.placeholder=['輸入新的房間或區域','輸入新的家具或設備','輸入新的具體位置'][index]||'輸入新層級';
+  input.hidden=true;
+  const existing=()=>[...placeLevels.children].slice(0,index).map(r=>r.querySelector('input').hidden?r.querySelector('select').value:r.querySelector('input').value.trim()).filter(Boolean);
+  const update=()=>{
+    const prefix=existing();
+    const candidates=new Set();
+    for(const place of knownPlaces){
+      const parts=locationParts(place);
+      if(parts.length>index && prefix.every((p,i)=>parts[i]===p))candidates.add(parts[index]);
+    }
+    const current=select.value||value;
+    select.replaceChildren(new Option('請選擇已建立的位置',''),...([...candidates].sort((a,b)=>a.localeCompare(b,'zh-Hant')).map(x=>new Option(x,x))),new Option('＋ 新增其他名稱','__new__'));
+    if(candidates.has(current)){select.value=current;input.hidden=true;select.hidden=false;}
+    else if(current && current!=='__new__'){select.value='__new__';input.hidden=false;input.value=current;select.hidden=true;}
+    else {select.value='';input.hidden=true;select.hidden=false;}
+  };
+  select.onchange=()=>{
+    if(select.value==='__new__'){input.value='';input.hidden=false;select.hidden=true;input.focus();}
+    [...placeLevels.children].slice(index+1).forEach(r=>{r.querySelector('input').value='';r.querySelector('select').value='';r.querySelector('input').hidden=true;r.querySelector('select').hidden=false;});
+    refreshPlaceLevels(index+1);
+  };
+  input.addEventListener('change',()=>refreshPlaceLevels(index+1));
+  const back=document.createElement('button');back.type='button';back.textContent='重新選擇';back.onclick=()=>{input.hidden=true;select.hidden=false;select.value='';refreshPlaceLevels(index+1);};
+  row.append(select,input,back);placeLevels.append(row);
+  update();
+  if(value&&!([...select.options].some(o=>o.value===value))){input.value=value;input.hidden=false;select.hidden=true;}
+}
+function refreshPlaceLevels(from=0){
+  [...placeLevels.children].slice(from).forEach(row=>{
+    const select=row.querySelector('select'),input=row.querySelector('input');
+    const current=input.hidden?select.value:input.value;
+    const index=[...placeLevels.children].indexOf(row);
+    const prefix=[...placeLevels.children].slice(0,index).map(r=>r.querySelector('input').hidden?r.querySelector('select').value:r.querySelector('input').value.trim());
+    const candidates=new Set();
+    for(const place of knownPlaces){const parts=locationParts(place);if(parts.length>index&&prefix.every((p,i)=>parts[i]===p))candidates.add(parts[index]);}
+    select.replaceChildren(new Option('請選擇已建立的位置',''),...([...candidates].sort((a,b)=>a.localeCompare(b,'zh-Hant')).map(x=>new Option(x,x))),new Option('＋ 新增其他名稱','__new__'));
+    if(candidates.has(current)){select.value=current;input.hidden=true;select.hidden=false;}
+    else {select.value='';input.value='';input.hidden=true;select.hidden=false;}
+  });
 }
 byId('place-add-level').onclick=()=>addPlaceLevel();
 byId('place-build-cancel').onclick=()=>{placeBuilder.hidden=true;placePicker.hidden=false;};
 byId('place-build-done').onclick=()=>{
-  const value=[...placeLevels.querySelectorAll('input')].map(x=>x.value.trim()).filter(Boolean).join(' > ');
+  const value=[...placeLevels.children].map(r=>r.querySelector('input').hidden?r.querySelector('select').value:r.querySelector('input').value.trim()).filter(x=>x&&x!=='__new__').join(' > ');
   if(!value){placeLevels.querySelector('input')?.focus();return;}
   if(value.length>180){alert('收納位置最多 180 字');return;}
   fields.place.value=value;draftPlace=value;manualPlace=false;
@@ -319,7 +362,7 @@ byId('place-build-done').onclick=()=>{
 };
 function openPlaceBuilder(){
   closePlaceOptions();placeLevels.replaceChildren();
-  const parts=fields.place.value.split(/\s*>\s*/).map(x=>x.trim()).filter(Boolean);
+  const parts=locationParts(fields.place.value);
   (parts.length?parts:['','','']).forEach(addPlaceLevel);
   placeBuilder.hidden=false;placePicker.hidden=true;fields.place.hidden=true;placeEdit.hidden=true;
 }
