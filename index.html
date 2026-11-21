@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.39">
+<meta name="app-version" content="1.0.0-rc.40">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -209,7 +209,7 @@ const placeStatus = byId('place-status');
 const removePlacePhoto = byId('remove-place-photo');
 
 function normalizedPlaceKey(place) {
-  return String(place || '').split(/\s*>\s*/).map(part => part.trim().replace(/\s+/g, ' ')).filter(Boolean).join(' > ');
+  return String(place || '').split(/\s*(?:>|→|＞)\s*/).map(part => part.trim().replace(/\s+/g, ' ')).filter(Boolean).join(' > ');
 }
 function photoForPlace(place) {
   const key = normalizedPlaceKey(place);
@@ -308,7 +308,7 @@ let manualPlace = false;
 let draftPlace = '';
 let knownPlaces = [];
 const placeBuilder = byId('place-builder'), placeLevels = byId('place-levels');
-function locationParts(value) { return value.split(/\s*>\s*/).map(x=>x.trim()).filter(Boolean); }
+function locationParts(value) { return String(value || '').split(/\s*(?:>|→|＞)\s*/).map(x=>x.trim()).filter(Boolean); }
 function updatePlaceDoneVisibility(){
   const first=placeLevels.firstElementChild;
   const selected=first && (first.querySelector('input').hidden ? first.querySelector('select').value : first.querySelector('input').value.trim());
@@ -754,8 +754,8 @@ let previousFilter = '';
 locationGallery.ontoggle = () => render();
 
 function render() {
-  const selected = locationFilter.value;
-  const places = [...new Set(entries.map(item => item.place))].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+  const selected = normalizedPlaceKey(locationFilter.value);
+  const places = [...new Map(entries.map(item => [normalizedPlaceKey(item.place), normalizedPlaceKey(item.place)])).values()].filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh-Hant'));
   locationFilter.replaceChildren(new Option('所有位置', ''));
   knownPlaces = places;
   for (const place of places) locationFilter.add(new Option(place, place));
@@ -768,11 +768,11 @@ function render() {
   const cards = byId('location-cards');
   cards.replaceChildren();
   const totals = new Map();
-  for (const item of entries) totals.set(item.place, (totals.get(item.place) ?? 0) + 1);
+  for (const item of entries) { const key = normalizedPlaceKey(item.place); totals.set(key, (totals.get(key) ?? 0) + 1); }
   // Limit photo cards to the selected location branch.
   const visiblePlaces = places.filter(place =>
     (!browsingPath.length || pathMatches(place, browsingPath)) &&
-    (!locationFilter.value || place === locationFilter.value)
+    (!locationFilter.value || normalizedPlaceKey(place) === normalizedPlaceKey(locationFilter.value))
   );
   for (const place of locationGallery.open ? visiblePlaces : []) {
     const button = element('button', '', cards);
@@ -810,7 +810,7 @@ function render() {
   const terms = query.split(/\s+/);
   const matches = entries.filter(item => {
     const text = [item.name, item.note || ''].join(' ').toLocaleLowerCase();
-    return (!locationFilter.value || item.place === locationFilter.value) &&
+    return (!locationFilter.value || normalizedPlaceKey(item.place) === normalizedPlaceKey(locationFilter.value)) &&
       (!browsingPath.length || pathMatches(item.place,browsingPath)) &&
       terms.every(term => text.includes(term));
   });
