@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.42">
+<meta name="app-version" content="1.0.0-rc.43">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -79,6 +79,18 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 
 #back-to-search-top{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom, 0px));z-index:50;background:#24533f;color:#fff;border:1px solid #24533f;border-radius:999px;padding:11px 16px;box-shadow:0 3px 12px #0003;font-weight:700;cursor:pointer}
 #back-to-search-top[hidden]{display:none}
+
+.search-location-group{border:1px solid #9cafa3;border-radius:14px;margin:16px 0;background:#f6f4ed;overflow:hidden}
+.search-location-heading{display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;list-style:none}
+.search-location-heading::-webkit-details-marker{display:none}
+.search-location-heading::after{content:'▾';font-size:1.25rem;margin-left:auto;flex-shrink:0}
+.search-location-group:not([open])>.search-location-heading::after{content:'▸'}
+.search-location-thumbnail,.search-location-placeholder{width:92px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#e4e6dd}
+.search-location-placeholder{display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#64766b;text-align:center;padding:5px}
+.search-location-info{min-width:0;display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.search-location-info small{font-size:.8rem;color:#52695d}
+.search-location-items{padding:0 10px 8px}
+.search-location-items>article{margin:8px 0}
 </style>
 <main>
 <header><div class="app-header-top"><h1>大海撈針</h1><div class="app-version-actions"><span id="app-version"></span><button id="check-update" type="button" hidden>檢查更新</button></div></div><p>記下你有哪些東西，以及去哪裡找。</p><p id="app-install-row"><button id="install-app" type="button" hidden>安裝到手機</button></p><p id="pwa-status" role="status" hidden></p><div id="app-update" role="status" hidden><p>大海撈針有新版本可以更新。</p><button id="apply-update" type="button">更新程式</button></div></header>
@@ -846,7 +858,53 @@ function render() {
     element('span', '第 ' + (page + 1) + ' 頁，共 ' + pageCount + ' 頁', pages);
   }
   if (!matches.length && entries.length) element('p', '找不到符合條件的物品。', list);
-  for (const item of matches.slice(page * pageSize, (page + 1) * pageSize)) {
+  const pageMatches = matches.slice(page * pageSize, (page + 1) * pageSize);
+  // Keyword results are grouped by exact storage location, without changing item records.
+  const grouped = Boolean(query);
+  let displayItems = pageMatches;
+  if (grouped) {
+    const groups = new Map();
+    for (const item of pageMatches) {
+      const place = normalizedPlaceKey(item.place) || '未設定收納位置';
+      if (!groups.has(place)) groups.set(place, []);
+      groups.get(place).push(item);
+    }
+    displayItems = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b, 'zh-Hant'))
+      .flatMap(([, group]) => group);
+  }
+  let lastPlace = null;
+  let groupContainer = list;
+  for (const item of displayItems) {
+    if (grouped) {
+      const place = normalizedPlaceKey(item.place) || '未設定收納位置';
+      if (place !== lastPlace) {
+        lastPlace = place;
+        const allInPlace = pageMatches.filter(entry => (normalizedPlaceKey(entry.place) || '未設定收納位置') === place);
+        const section = element('details', '', list);
+        section.className = 'search-location-group';
+        section.open = true;
+        const heading = element('summary', '', section);
+        heading.className = 'search-location-heading';
+        const photo = photoForPlace(place);
+        if (photo) {
+          const thumbnail = element('img', '', heading);
+          thumbnail.src = photo;
+          thumbnail.alt = '收納位置照片';
+          thumbnail.loading = 'lazy';
+          thumbnail.className = 'search-location-thumbnail';
+        } else {
+          const placeholder = element('span', '無位置照片', heading);
+          placeholder.className = 'search-location-placeholder';
+        }
+        const info = element('span', '', heading);
+        info.className = 'search-location-info';
+        element('strong', place, info);
+        element('small', '本頁符合搜尋：' + allInPlace.length + ' 件 · 點此收合／展開', info);
+        groupContainer = element('div', '', section);
+        groupContainer.className = 'search-location-items';
+      }
+    }
+    const card = element('article', '', groupContainer);
     const card = element('article', '', list);
     element('h3', item.name, card);
     element('p', item.place, card).className = 'place';
