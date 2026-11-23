@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.43">
+<meta name="app-version" content="1.0.0-rc.44">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -905,7 +905,6 @@ function render() {
       }
     }
     const card = element('article', '', groupContainer);
-    const card = element('article', '', list);
     element('h3', item.name, card);
     element('p', item.place, card).className = 'place';
     const photos = [[item.photo, '物品照片'], [item.extraPhoto, '第二張物品照片'], [photoForPlace(item.place), '收納位置照片']];
