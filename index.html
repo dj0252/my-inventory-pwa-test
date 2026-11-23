@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.44">
+<meta name="app-version" content="1.0.0-rc.45">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -91,6 +91,15 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 .search-location-info small{font-size:.8rem;color:#52695d}
 .search-location-items{padding:0 10px 8px}
 .search-location-items>article{margin:8px 0}
+
+/* Keyword search: location photo dividers between ordinary item cards. */
+.search-location-divider{display:flex;align-items:center;gap:12px;margin:22px 0 10px;padding:12px;background:#f6f4ed;border-top:2px solid #9cafa3;border-bottom:1px solid #c6d0c7}
+.search-location-photo-button{padding:0;border:0;background:transparent;flex-shrink:0;cursor:zoom-in}
+.search-location-thumbnail,.search-location-placeholder{width:94px;height:78px;object-fit:cover;border-radius:8px;display:block}
+.search-location-placeholder{background:#e4e6dd;color:#64766b;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.75rem;padding:5px}
+.search-location-info{min-width:0;display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.search-location-info strong{font-size:1rem}
+.search-location-info small{font-size:.82rem;color:#52695d}
 </style>
 <main>
 <header><div class="app-header-top"><h1>大海撈針</h1><div class="app-version-actions"><span id="app-version"></span><button id="check-update" type="button" hidden>檢查更新</button></div></div><p>記下你有哪些東西，以及去哪裡找。</p><p id="app-install-row"><button id="install-app" type="button" hidden>安裝到手機</button></p><p id="pwa-status" role="status" hidden></p><div id="app-update" role="status" hidden><p>大海撈針有新版本可以更新。</p><button id="apply-update" type="button">更新程式</button></div></header>
@@ -880,34 +889,37 @@ function render() {
       if (place !== lastPlace) {
         lastPlace = place;
         const allInPlace = pageMatches.filter(entry => (normalizedPlaceKey(entry.place) || '未設定收納位置') === place);
-        const section = element('details', '', list);
-        section.className = 'search-location-group';
-        section.open = true;
-        const heading = element('summary', '', section);
-        heading.className = 'search-location-heading';
+        const heading = element('div', '', list);
+        heading.className = 'search-location-divider';
         const photo = photoForPlace(place);
         if (photo) {
-          const thumbnail = element('img', '', heading);
+          const zoom = element('button', '', heading);
+          zoom.type = 'button';
+          zoom.className = 'search-location-photo-button';
+          zoom.setAttribute('aria-label', '放大查看' + place + '的位置照片');
+          zoom.onclick = () => openPhoto(photo, place + '的位置照片', '收納位置照片');
+          const thumbnail = element('img', '', zoom);
           thumbnail.src = photo;
-          thumbnail.alt = '收納位置照片';
+          thumbnail.alt = place + '的位置照片';
           thumbnail.loading = 'lazy';
           thumbnail.className = 'search-location-thumbnail';
         } else {
           const placeholder = element('span', '無位置照片', heading);
           placeholder.className = 'search-location-placeholder';
         }
-        const info = element('span', '', heading);
+        const info = element('div', '', heading);
         info.className = 'search-location-info';
         element('strong', place, info);
-        element('small', '本頁符合搜尋：' + allInPlace.length + ' 件 · 點此收合／展開', info);
-        groupContainer = element('div', '', section);
-        groupContainer.className = 'search-location-items';
+        element('small', '本頁符合搜尋：' + allInPlace.length + ' 件', info);
+        groupContainer = list;
       }
     }
     const card = element('article', '', groupContainer);
     element('h3', item.name, card);
     element('p', item.place, card).className = 'place';
-    const photos = [[item.photo, '物品照片'], [item.extraPhoto, '第二張物品照片'], [photoForPlace(item.place), '收納位置照片']];
+    const photos = grouped
+      ? [[item.photo, '物品照片'], [item.extraPhoto, '第二張物品照片']]
+      : [[item.photo, '物品照片'], [item.extraPhoto, '第二張物品照片'], [photoForPlace(item.place), '收納位置照片']];
     if (item.note || photos.some(([source]) => source)) {
       const gallery = element('div', '', card);
       gallery.className = 'gallery';
