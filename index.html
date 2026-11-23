@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.40">
+<meta name="app-version" content="1.0.0-rc.41">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -751,6 +751,16 @@ const locationGallery = byId('location-gallery');
 const pageSize = 24;
 let page = 0;
 let previousFilter = '';
+let returnToSearch = null;
+function restoreSearchResults() {
+  if (!returnToSearch) return false;
+  const scrollY = returnToSearch.scrollY;
+  returnToSearch = null;
+  selectTab(tabs[1]);
+  render();
+  requestAnimationFrame(() => window.scrollTo({top: scrollY, left: 0, behavior: 'instant'}));
+  return true;
+}
 locationGallery.ontoggle = () => render();
 
 function render() {
@@ -869,6 +879,7 @@ function render() {
     const actions = element('div', '', card);
     actions.className = 'actions';
     element('button', '編輯／移動', actions).onclick = () => {
+      returnToSearch = {scrollY: window.scrollY};
       selectTab(tabs[0]);
       editing = item.id;
       fields.name.value = item.name;
@@ -970,14 +981,16 @@ form.onsubmit = async event => {
     return updated;
   });
   saveButton.disabled = true;
+  const wasEditing = editing !== null;
   if (await save(linked, '已儲存「' + name + '」。')) {
     resetForm();
     clearEntryValidation();
-    byId('query').value = '';
-    locationFilter.value = '';
-    render();
-    // Return to the top only after the item has been saved successfully.
-    window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+    if (!wasEditing || !restoreSearchResults()) {
+      byId('query').value = '';
+      locationFilter.value = '';
+      render();
+      window.scrollTo({top: 0, left: 0, behavior: 'instant'});
+    }
     saveButton.textContent = '儲存成功';
     setTimeout(() => {
       saveButton.textContent = '儲存物品';
@@ -989,7 +1002,11 @@ form.onsubmit = async event => {
   }
   saveButton.disabled = false;
 };
-byId('cancel').onclick = () => { resetForm(); status.textContent = ''; fields.name.focus(); };
+byId('cancel').onclick = () => {
+  resetForm();
+  status.textContent = '';
+  if (!restoreSearchResults()) fields.name.focus();
+};
 byId('query').oninput = render;
 locationFilter.onchange = () => {
   browsingPath=locationFilter.value?locationParts(locationFilter.value):[];
