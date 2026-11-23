@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.45">
+<meta name="app-version" content="1.0.0-rc.46">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -100,6 +100,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 .search-location-info{min-width:0;display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}
 .search-location-info strong{font-size:1rem}
 .search-location-info small{font-size:.82rem;color:#52695d}
+.search-location-overview{margin:12px 0 20px}.search-location-overview>h3,.search-items-heading{margin:16px 0 10px}.search-location-overview .search-location-divider{margin:8px 0;border:1px solid #c6d0c7;border-radius:10px}
 </style>
 <main>
 <header><div class="app-header-top"><h1>大海撈針</h1><div class="app-version-actions"><span id="app-version"></span><button id="check-update" type="button" hidden>檢查更新</button></div></div><p>記下你有哪些東西，以及去哪裡找。</p><p id="app-install-row"><button id="install-app" type="button" hidden>安裝到手機</button></p><p id="pwa-status" role="status" hidden></p><div id="app-update" role="status" hidden><p>大海撈針有新版本可以更新。</p><button id="apply-update" type="button">更新程式</button></div></header>
@@ -868,53 +869,46 @@ function render() {
   }
   if (!matches.length && entries.length) element('p', '找不到符合條件的物品。', list);
   const pageMatches = matches.slice(page * pageSize, (page + 1) * pageSize);
-  // Keyword results are grouped by exact storage location, without changing item records.
+  // Keyword search: show all matching storage locations first, then ordinary item cards.
   const grouped = Boolean(query);
-  let displayItems = pageMatches;
-  if (grouped) {
-    const groups = new Map();
-    for (const item of pageMatches) {
+  const displayItems = pageMatches;
+  if (grouped && matches.length) {
+    const placeCounts = new Map();
+    for (const item of matches) {
       const place = normalizedPlaceKey(item.place) || '未設定收納位置';
-      if (!groups.has(place)) groups.set(place, []);
-      groups.get(place).push(item);
+      placeCounts.set(place, (placeCounts.get(place) || 0) + 1);
     }
-    displayItems = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b, 'zh-Hant'))
-      .flatMap(([, group]) => group);
-  }
-  let lastPlace = null;
-  let groupContainer = list;
-  for (const item of displayItems) {
-    if (grouped) {
-      const place = normalizedPlaceKey(item.place) || '未設定收納位置';
-      if (place !== lastPlace) {
-        lastPlace = place;
-        const allInPlace = pageMatches.filter(entry => (normalizedPlaceKey(entry.place) || '未設定收納位置') === place);
-        const heading = element('div', '', list);
-        heading.className = 'search-location-divider';
-        const photo = photoForPlace(place);
-        if (photo) {
-          const zoom = element('button', '', heading);
-          zoom.type = 'button';
-          zoom.className = 'search-location-photo-button';
-          zoom.setAttribute('aria-label', '放大查看' + place + '的位置照片');
-          zoom.onclick = () => openPhoto(photo, place + '的位置照片', '收納位置照片');
-          const thumbnail = element('img', '', zoom);
-          thumbnail.src = photo;
-          thumbnail.alt = place + '的位置照片';
-          thumbnail.loading = 'lazy';
-          thumbnail.className = 'search-location-thumbnail';
-        } else {
-          const placeholder = element('span', '無位置照片', heading);
-          placeholder.className = 'search-location-placeholder';
-        }
-        const info = element('div', '', heading);
-        info.className = 'search-location-info';
-        element('strong', place, info);
-        element('small', '本頁符合搜尋：' + allInPlace.length + ' 件', info);
-        groupContainer = list;
+    const overview = element('div', '', list);
+    overview.className = 'search-location-overview';
+    element('h3', '符合條件的收納位置（' + placeCounts.size + ' 處）', overview);
+    for (const [place, count] of [...placeCounts.entries()].sort(([a], [b]) => a.localeCompare(b, 'zh-Hant'))) {
+      const heading = element('div', '', overview);
+      heading.className = 'search-location-divider';
+      const photo = photoForPlace(place);
+      if (photo) {
+        const zoom = element('button', '', heading);
+        zoom.type = 'button';
+        zoom.className = 'search-location-photo-button';
+        zoom.setAttribute('aria-label', '放大查看' + place + '的位置照片');
+        zoom.onclick = () => openPhoto(photo, place + '的位置照片', '收納位置照片');
+        const thumbnail = element('img', '', zoom);
+        thumbnail.src = photo;
+        thumbnail.alt = place + '的位置照片';
+        thumbnail.loading = 'lazy';
+        thumbnail.className = 'search-location-thumbnail';
+      } else {
+        const placeholder = element('span', '無位置照片', heading);
+        placeholder.className = 'search-location-placeholder';
       }
+      const info = element('div', '', heading);
+      info.className = 'search-location-info';
+      element('strong', place, info);
+      element('small', '符合搜尋：' + count + ' 件', info);
     }
-    const card = element('article', '', groupContainer);
+    element('h3', '符合條件的物品（' + matches.length + ' 件）', list).className = 'search-items-heading';
+  }
+  for (const item of displayItems) {
+    const card = element('article', '', list);
     element('h3', item.name, card);
     element('p', item.place, card).className = 'place';
     const photos = grouped
