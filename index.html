@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.51">
+<meta name="app-version" content="1.0.0-rc.52">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -102,7 +102,7 @@ button:disabled{box-shadow:inset 0 0 0 var(--button-ring-width,2px) #fff}
 .search-location-info small{font-size:.82rem;color:#52695d}
 .search-location-overview{margin:12px 0 20px}.search-location-overview>h3,.search-items-heading{margin:16px 0 10px}.search-location-overview .search-location-divider{margin:8px 0;border:1px solid #c6d0c7;border-radius:10px}
 .search-location-divider[role=button]{cursor:pointer}.search-location-divider[role=button]:focus-visible{outline:3px solid #24533f;outline-offset:2px}.search-location-selected{border:2px solid #24533f!important;background:#e8f1e9}.search-location-back{margin:6px 0 12px;background:#24533f;color:#f0c18e}
-#count .database-name{font-size:1.15em;font-weight:700;overflow-wrap:anywhere}
+#count .database-name{font-size:1em;font-weight:700;color:#b8860b;overflow-wrap:anywhere}
 </style>
 <main>
 <header><div class="app-header-top"><h1>大海撈針</h1><div class="app-version-actions"><span id="app-version"></span><button id="check-update" type="button" hidden>檢查更新</button></div></div><p>記下你有哪些東西，以及去哪裡找。</p><p id="app-install-row"><button id="install-app" type="button" hidden>安裝到手機</button></p><p id="pwa-status" role="status" hidden></p><div id="app-update" role="status" hidden><p>大海撈針有新版本可以更新。</p><button id="apply-update" type="button">更新程式</button></div></header>
@@ -856,7 +856,7 @@ function render() {
     } else {
       count.append(document.createTextNode('本機'));
     }
-    count.append(document.createTextNode('資料庫，共有 ' + entries.length + ' 筆物品。輸入關鍵字或選擇位置即可查看。'));
+    count.append(document.createTextNode('資料庫'), document.createElement('br'), document.createTextNode('共有 ' + entries.length + ' 筆物品。輸入關鍵字或選擇位置即可查看。'));
     return;
   }
   const terms = query.split(/\s+/);
