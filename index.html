@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.49">
+<meta name="app-version" content="1.0.0-rc.50">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -842,7 +842,7 @@ function render() {
   list.replaceChildren();
   pages.replaceChildren();
   if (!query && !locationFilter.value && !browsingPath.length) {
-    byId('count').textContent = '目前有 ' + entries.length + ' 筆物品。輸入關鍵字或選擇位置即可查看。';
+    byId('count').textContent = '目前使用資料庫：personal-inventory，共有 ' + entries.length + ' 筆物品。輸入關鍵字或選擇位置即可查看。';
     return;
   }
   const terms = query.split(/\s+/);
