@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>大海撈針</title>
-<meta name="app-version" content="1.0.0-rc.53">
+<meta name="app-version" content="1.0.0-rc.54">
 <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
 <meta name="theme-color" content="#24533f">
 <style>
@@ -901,7 +901,7 @@ function render() {
     overview.className = 'search-location-overview';
     element('h3', '符合條件的收納位置（' + placeCounts.size + ' 處）', overview);
     if (selectedSearchPlace) {
-      const back = element('button', '↩️ 返回全部搜尋結果', overview);
+      const back = element('button', '↩️ 列出全部搜尋結果', overview);
       back.type = 'button';
       back.className = 'search-location-back';
       back.onclick = () => { selectedSearchPlace = ''; page = 0; render(); byId('items').scrollIntoView({behavior:'smooth',block:'start'}); };
